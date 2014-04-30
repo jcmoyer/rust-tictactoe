@@ -356,6 +356,8 @@ impl GameState for PlayState {
   }
 
   fn on_mouse_down(&mut self, button: Mouse, x: int, y: int) {
+    use sdl2::mouse::LeftMouse;
+
     match self.winner {
       Neither => {},
       _ => {
@@ -364,20 +366,22 @@ impl GameState for PlayState {
       }
     }
 
-    match self.area.unproject(x, y) {
-      Some((row,col)) => {
-        match self.field.get_mut_cell_xy(col as uint, row as uint) {
-          Some(r) => match *r {
-            None => {
-              *r = Some(self.turn);
-              self.turn = self.turn.opposite();
+    if button == LeftMouse {
+      match self.area.unproject(x, y) {
+        Some((row,col)) => {
+          match self.field.get_mut_cell_xy(col as uint, row as uint) {
+            Some(r) => match *r {
+              None => {
+                *r = Some(self.turn);
+                self.turn = self.turn.opposite();
+              },
+              _ => println!("space already occupied")
             },
-            _ => println!("space already occupied")
-          },
-          None => fail!("invalid coords! this should never happen!")
-        }
-      },
-      None => println!("clicked out of bounds")
+            None => fail!("invalid coords! this should never happen!")
+          }
+        },
+        None => println!("clicked out of bounds")
+      }
     }
 
     self.winner = self.check_winner();
