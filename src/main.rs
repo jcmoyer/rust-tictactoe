@@ -15,14 +15,17 @@ use sdl2::pixels::RGB;
 
 use sdl2::mouse::Mouse;
 
+type SdlResult = Result<(), ~str>;
+
 /// Draws a player X mark at a given location.
-fn draw_x(r: &Renderer, x: i32, y: i32, w: i32, h: i32) {
-  r.draw_line(Point::new(x, y), Point::new(x + w, y + h));
-  r.draw_line(Point::new(x + w, y), Point::new(x, y + h));
+fn draw_x(r: &Renderer, x: i32, y: i32, w: i32, h: i32) -> SdlResult {
+  try!(r.draw_line(Point::new(x, y), Point::new(x + w, y + h)));
+  try!(r.draw_line(Point::new(x + w, y), Point::new(x, y + h)));
+  Ok(())
 }
 
 /// Draws a player O mark at a given location.
-fn draw_o(r: &Renderer, x: i32, y: i32, w: i32, h: i32) {
+fn draw_o(r: &Renderer, x: i32, y: i32, w: i32, h: i32) -> SdlResult {
   use std::f32::consts::PI;
 
   let segs = 16;
@@ -43,13 +46,15 @@ fn draw_o(r: &Renderer, x: i32, y: i32, w: i32, h: i32) {
     let pt2 = Point::new(
       (cx + (b * segr).cos() * rx) as i32,
       (cy + (b * segr).sin() * ry) as i32);
-    r.draw_line(pt1, pt2);
+    try!(r.draw_line(pt1, pt2));
   }
+  Ok(())
 }
 
 /// Specifies a set of methods that all game states should implement.
 trait GameState {
-  fn render(&self, r: &Renderer) {
+  fn render(&self, r: &Renderer) -> SdlResult {
+    Ok(())
   }
 
   fn on_mouse_down(&mut self, mouse: Mouse, x: int, y: int) {
@@ -308,42 +313,44 @@ impl PlayState {
   }
 }
 impl GameState for PlayState {
-  fn render(&self, renderer: &Renderer) {
-    renderer.set_draw_color(RGB(0, 0, 0));
-    renderer.clear();
+  fn render(&self, renderer: &Renderer) -> SdlResult {
+    try!(renderer.set_draw_color(RGB(0, 0, 0)));
+    try!(renderer.clear());
 
-    renderer.set_draw_color(RGB(255, 0, 0));
+    try!(renderer.set_draw_color(RGB(255, 0, 0)));
 
     for i in range(1, 3) {
       let x1 = self.area.x as i32;
       let y1 = (self.area.y + self.area.cell_height() * i) as i32;
       let x2 = (self.area.x + self.area.w) as i32;
       let y2 = (self.area.y + self.area.cell_height() * i) as i32;
-      renderer.draw_line(Point::new(x1, y1), Point::new(x2, y2));
+      try!(renderer.draw_line(Point::new(x1, y1), Point::new(x2, y2)));
     }
     for i in range(1, 3) {
       let x1 = (self.area.x + self.area.cell_width() * i) as i32;
       let y1 = self.area.y as i32;
       let x2 = (self.area.x + self.area.cell_width() * i) as i32;
       let y2 = (self.area.y + self.area.h) as i32;
-      renderer.draw_line(Point::new(x1, y1), Point::new(x2, y2));
+      try!(renderer.draw_line(Point::new(x1, y1), Point::new(x2, y2)));
     }
 
-    renderer.set_draw_color(RGB(0, 255, 0));
+    try!(renderer.set_draw_color(RGB(0, 255, 0)));
 
     for row in range(0, 3) {
       for col in range(0, 3) {
         let pt = self.area.project(row, col);
 
         self.field.get_cell_xy(col as uint, row as uint).map(|mark| {
+          // TODO: Try to remove a layer of indirection here
           match mark {
             Some(X) => draw_x(renderer, pt.x, pt.y, self.area.cell_width() as i32, self.area.cell_height() as i32),
             Some(O) => draw_o(renderer, pt.x, pt.y, self.area.cell_width() as i32, self.area.cell_height() as i32),
-            _ => {}
+            _ => Ok(())
           }
-        });
+        }).unwrap().unwrap();
       }
     }
+    Ok(())
   }
 
   fn on_mouse_down(&mut self, button: Mouse, x: int, y: int) {
@@ -430,7 +437,7 @@ fn main() {
       _ => {}
     }
 
-    state.render(renderer);
+    state.render(renderer).unwrap();
     renderer.present();
   }
 
