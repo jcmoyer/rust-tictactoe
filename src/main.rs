@@ -53,10 +53,12 @@ fn draw_o(r: &Renderer, x: i32, y: i32, w: i32, h: i32) -> SdlResult {
 
 /// Specifies a set of methods that all game states should implement.
 trait GameState {
+  #[allow(unused_variable)]
   fn render(&self, r: &Renderer) -> SdlResult {
     Ok(())
   }
 
+  #[allow(unused_variable)]
   fn on_mouse_down(&mut self, mouse: Mouse, x: int, y: int) {
   }
 }
