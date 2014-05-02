@@ -10,12 +10,12 @@ use sdl2::render::Renderer;
 use sdl2::render::DriverAuto;
 use sdl2::render::Accelerated;
 
-use sdl2::rect::Point;
+use sdl2::rect::{Rect, Point};
 use sdl2::pixels::RGB;
 
 use sdl2::mouse::Mouse;
 
-use game::field::{Mark, PlayField};
+use game::field::{Mark, PlayField, FieldArea};
 use game::field::{X, O};
 
 use util::SdlResult;
@@ -43,69 +43,6 @@ enum WinState {
   Neither
 }
 
-/// Represents an on-screen area where a Tic-tac-toe board can be interacted
-/// with.
-struct FieldArea {
-  x: int, y: int,
-  w: int, h: int
-}
-
-impl FieldArea {
-  /// Returns the width of an individual cell.
-  fn cell_width(&self) -> int {
-    self.w / 3
-  }
-
-  /// Returns the height of an individual cell.
-  fn cell_height(&self) -> int {
-    self.h / 3
-  }
-
-  /// Computes the row at a given on-screen Y-coordinate.
-  fn unproject_row(&self, y: int) -> Option<int> {
-    if y >= self.y {
-      match (y - self.y) / self.cell_height() {
-        ix if ix > 2 => None,
-        ix           => Some(ix)
-      }
-    } else {
-      None
-    }
-  }
-
-  /// Computes the column at a given on-screen X-coordinate.
-  fn unproject_col(&self, x: int) -> Option<int> {
-    if x >= self.x {
-      match (x - self.x) / self.cell_width() {
-        ix if ix > 2 => None,
-        ix           => Some(ix)
-      }
-    } else {
-      None
-    }
-  }
-
-  /// Computes the given row and column given on-screen X and Y coordinates.
-  fn unproject(&self, x: int, y: int) -> Option<(int, int)> {
-    let row = match self.unproject_row(y) {
-      Some(row) => row,
-      None      => return None
-    };
-    let col = match self.unproject_col(x) {
-      Some(col) => col,
-      None      => return None
-    };
-    Some((row, col))
-  }
-
-  /// Computes the on-screen X and Y coordinates for a given row and column.
-  fn project(&self, row: int, col: int) -> Point {
-    let x = (self.x + col * self.cell_width()) as i32;
-    let y = (self.y + row * self.cell_height()) as i32;
-    Point::new(x, y)
-  }
-}
-
 struct PlayState {
   field: PlayField,
   area: FieldArea,
@@ -116,9 +53,7 @@ impl PlayState {
   fn new() -> ~PlayState {
     ~PlayState {
       field: PlayField::new(),
-      area: FieldArea {
-        x: 100, y: 0, w: 600, h: 600
-      },
+      area: FieldArea::from_rect(&Rect::new(100, 0, 600, 600)),
       turn: X,
       winner: Neither
     }
