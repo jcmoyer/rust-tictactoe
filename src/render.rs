@@ -1,7 +1,10 @@
 use sdl2::render::Renderer;
 use sdl2::rect::Point;
+use sdl2::pixels::RGB;
 
 use util::SdlResult;
+
+use game::field::FieldArea;
 
 mod util;
 
@@ -35,6 +38,25 @@ pub fn draw_o(r: &Renderer, x: i32, y: i32, w: i32, h: i32) -> SdlResult {
       (cx + (b * segr).cos() * rx) as i32,
       (cy + (b * segr).sin() * ry) as i32);
     try!(r.draw_line(pt1, pt2));
+  }
+  Ok(())
+}
+
+pub fn draw_field(r: &Renderer, area: &FieldArea) -> SdlResult {
+  try!(r.set_draw_color(RGB(255, 0, 0)));
+  for i in range(1, 3) {
+    let x1 = area.x as i32;
+    let y1 = (area.y + area.cell_height() * i) as i32;
+    let x2 = (area.x + area.w) as i32;
+    let y2 = (area.y + area.cell_height() * i) as i32;
+    try!(r.draw_line(Point::new(x1, y1), Point::new(x2, y2)));
+  }
+  for i in range(1, 3) {
+    let x1 = (area.x + area.cell_width() * i) as i32;
+    let y1 = area.y as i32;
+    let x2 = (area.x + area.cell_width() * i) as i32;
+    let y2 = (area.y + area.h) as i32;
+    try!(r.draw_line(Point::new(x1, y1), Point::new(x2, y2)));
   }
   Ok(())
 }

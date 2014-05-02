@@ -10,7 +10,7 @@ use sdl2::render::Renderer;
 use sdl2::render::DriverAuto;
 use sdl2::render::Accelerated;
 
-use sdl2::rect::{Rect, Point};
+use sdl2::rect::Rect;
 use sdl2::pixels::RGB;
 
 use sdl2::mouse::Mouse;
@@ -64,23 +64,7 @@ impl GameState for PlayState {
     try!(renderer.set_draw_color(RGB(0, 0, 0)));
     try!(renderer.clear());
 
-    try!(renderer.set_draw_color(RGB(255, 0, 0)));
-
-    for i in range(1, 3) {
-      let x1 = self.area.x as i32;
-      let y1 = (self.area.y + self.area.cell_height() * i) as i32;
-      let x2 = (self.area.x + self.area.w) as i32;
-      let y2 = (self.area.y + self.area.cell_height() * i) as i32;
-      try!(renderer.draw_line(Point::new(x1, y1), Point::new(x2, y2)));
-    }
-    for i in range(1, 3) {
-      let x1 = (self.area.x + self.area.cell_width() * i) as i32;
-      let y1 = self.area.y as i32;
-      let x2 = (self.area.x + self.area.cell_width() * i) as i32;
-      let y2 = (self.area.y + self.area.h) as i32;
-      try!(renderer.draw_line(Point::new(x1, y1), Point::new(x2, y2)));
-    }
-
+    try!(render::draw_field(renderer, &self.area));
     try!(renderer.set_draw_color(RGB(0, 255, 0)));
 
     for row in range(0, 3) {
