@@ -18,23 +18,14 @@ use sdl2::mouse::Mouse;
 use game::field::{Mark, PlayField, FieldArea};
 use game::field::{X, O};
 
+use gamestate::GameState;
+
 use util::SdlResult;
 
 mod game;
 mod util;
 mod render;
-
-/// Specifies a set of methods that all game states should implement.
-trait GameState {
-  #[allow(unused_variable)]
-  fn render(&self, r: &Renderer) -> SdlResult {
-    Ok(())
-  }
-
-  #[allow(unused_variable)]
-  fn on_mouse_down(&mut self, mouse: Mouse, x: int, y: int) {
-  }
-}
+mod gamestate;
 
 /// Represents the winner in a game of Tic-tac-toe.
 enum WinState {
@@ -59,7 +50,7 @@ impl PlayState {
     }
   }
 }
-impl GameState for PlayState {
+impl gamestate::GameState for PlayState {
   fn render(&self, renderer: &Renderer) -> SdlResult {
     try!(renderer.set_draw_color(RGB(0, 0, 0)));
     try!(renderer.clear());
