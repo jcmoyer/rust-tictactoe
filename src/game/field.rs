@@ -58,8 +58,8 @@ impl PlayField {
   }
 
   /// Returns an iterator over the `PlayLine`s in this field.
-  pub fn lines<'a>(&'a self) -> LineIterator<'a> {
-    LineIterator::from_field(self)
+  pub fn lines<'a>(&'a self) -> Lines<'a> {
+    Lines::from_field(self)
   }
 
   fn horizontal_line(&self, row: uint) -> Option<PlayLine> {
@@ -179,7 +179,7 @@ impl FieldArea {
   }
 }
 
-enum LineIteratorState {
+enum LinesState {
   Row(uint),
   Column(uint),
   LtrDiagonal,
@@ -187,21 +187,21 @@ enum LineIteratorState {
   Finished
 }
 
-struct LineIterator<'a> {
+struct Lines<'a> {
   field: &'a PlayField,
-  state: LineIteratorState
+  state: LinesState
 }
 
-impl<'a> LineIterator<'a> {
-  fn from_field<'a>(f: &'a PlayField) -> LineIterator<'a> {
-    LineIterator {
+impl<'a> Lines<'a> {
+  fn from_field<'a>(f: &'a PlayField) -> Lines<'a> {
+    Lines {
       field: f,
       state: Row(0)
     }
   }
 }
 
-impl<'a> Iterator<PlayLine> for LineIterator<'a> {
+impl<'a> Iterator<PlayLine> for Lines<'a> {
   fn next(&mut self) -> Option<PlayLine> {
     match self.state {
       Row(place) => {
