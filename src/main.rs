@@ -13,7 +13,6 @@ use sdl2::render::Accelerated;
 use gamestate::GameState;
 
 mod game;
-mod util;
 mod render;
 mod gamestate;
 mod states;
@@ -35,17 +34,20 @@ fn main() {
   // TODO: state machine
   let mut state = states::playstate::PlayState::new();
 
-  loop {
+  'main: loop {
     use sdl2::event::poll_event;
-    use sdl2::event::{QuitEvent, MouseButtonDownEvent};
+    use sdl2::event::{QuitEvent, MouseButtonDownEvent, NoEvent};
 
-    match poll_event() {
-      QuitEvent(..) => break,
-      MouseButtonDownEvent(_, _, _, button, x, y) => state.on_mouse_down(button, x, y),
-      _ => {}
+    'event: loop {
+      match poll_event() {
+        QuitEvent(..) => break 'main,
+        MouseButtonDownEvent(_, _, _, button, x, y) => state.on_mouse_down(button, x, y),
+        NoEvent => break 'event,
+        _ => {}
+      }
     }
 
-    state.render(renderer).unwrap();
+    state.render(&renderer).unwrap();
     renderer.present();
   }
 

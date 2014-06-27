@@ -1,12 +1,11 @@
+use sdl2::SdlResult;
 use sdl2::mouse::Mouse;
 use sdl2::render::Renderer;
-
-use util;
 
 /// Specifies a set of methods that all game states should implement.
 pub trait GameState {
   #[allow(unused_variable)]
-  fn render(&self, r: &Renderer) -> util::SdlResult {
+  fn render<T>(&self, r: &Renderer<T>) -> SdlResult<()> {
     Ok(())
   }
 

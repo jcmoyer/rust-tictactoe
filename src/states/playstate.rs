@@ -1,3 +1,4 @@
+use sdl2::SdlResult;
 use sdl2::render::Renderer;
 
 use sdl2::rect::Rect;
@@ -7,8 +8,6 @@ use sdl2::mouse::Mouse;
 
 use game::field::{Mark, PlayField, FieldArea};
 use game::field::{X, O};
-
-use util::SdlResult;
 
 use render;
 use gamestate;
@@ -39,15 +38,15 @@ impl PlayState {
 }
 
 impl gamestate::GameState for PlayState {
-  fn render(&self, renderer: &Renderer) -> SdlResult {
+  fn render<T>(&self, renderer: &Renderer<T>) -> SdlResult<()> {
     try!(renderer.set_draw_color(RGB(0, 0, 0)));
     try!(renderer.clear());
 
     try!(render::draw_field(renderer, &self.area));
     try!(renderer.set_draw_color(RGB(0, 255, 0)));
 
-    for row in range(0, 3) {
-      for col in range(0, 3) {
+    for row in range(0i, 3i) {
+      for col in range(0i, 3i) {
         let pt = self.area.project(row, col);
 
         self.field.get_cell_xy(col as uint, row as uint).map(|mark| {
