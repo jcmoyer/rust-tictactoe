@@ -1,0 +1,14 @@
+[package]
+
+name    = "TicTacToe"
+version = "0.0.1"
+authors = [ "J.C. Moyer<https://github.com/jcmoyer>" ]
+
+[[bin]]
+
+name = "TicTacToe"
+path = "src/main.rs"
+
+[dependencies.sdl2]
+
+git = "https://github.com/AngryLawyer/rust-sdl2.git"
