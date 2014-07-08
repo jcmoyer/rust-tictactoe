@@ -1,5 +1,3 @@
-#![crate_id="TicTacToe#0.1"]
-
 extern crate sdl2;
 
 use sdl2::video::Window;
