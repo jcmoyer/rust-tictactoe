@@ -23,7 +23,7 @@ impl PlayLine {
   /// Determines if this line counts as a win. Returns the winner wrapped in an
   /// Option, with None meaning that this line is not a winning one.
   pub fn is_win(&self) -> Option<Mark> {
-    let (xs, os) = self.cells.iter().fold((0, 0), |(xs, os), &place| {
+    let (xs, os) = self.cells.iter().fold((0i, 0i), |(xs, os), &place| {
       match place {
         Some(X) => (xs + 1, os),
         Some(O) => (xs, os + 1),
